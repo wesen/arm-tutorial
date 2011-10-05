@@ -1,7 +1,7 @@
 TOOLCHAIN_PREFIX ?= arm-none-eabi-
 
 CC = $(TOOLCHAIN_PREFIX)gcc
-LD = $(TOOLCHAIN_PREFIX)ld -v
+LD = $(TOOLCHAIN_PREFIX)ld
 AR = $(TOOLCHAIN_PREFIX)ar
 AS = $(TOOLCHAIN_PREFIX)as
 OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
@@ -20,7 +20,7 @@ OBJS   = crt.o main.o board.o timer.o blinker.o
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $*
+	$(LD) $(LDFLAGS) -o $@ $^
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
