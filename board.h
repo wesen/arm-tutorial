@@ -15,4 +15,15 @@ extern void at91_spurious_handler(void);
 extern void at91_default_irq_handler(void);
 extern void at91_default_fiq_handler(void);
 
+/*
+ * enable/disable IRQ/FIQ helpers
+ */
+extern uint32_t irq_enable(void);
+extern uint32_t irq_disable(void);
+extern uint32_t irq_restore(uint32_t cpsr);
+
+extern uint32_t fiq_enable(void);
+extern uint32_t fiq_disable(void);
+extern uint32_t fiq_restore(uint32_t cpsr);
+
 #endif /* BOARD_H__ */
