@@ -27,7 +27,7 @@
  * Therefore:
  * - set timer channel 9 register RC to 9835
  **/
-void timer_setup(void) {
+void timer_init(void) {
   /*
    * enable timer0 peripheral clock
    *

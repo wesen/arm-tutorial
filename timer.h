@@ -3,7 +3,7 @@
 
 #include "board.h"
 
-void timer_setup(void);
+void timer_init(void);
 void timer0_irq_handler(void);
 
 extern uint32_t tick_count;
