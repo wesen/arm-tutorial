@@ -7,11 +7,27 @@
  **/
 
 #include "board.h"
+#include "timer.h"
+
+void leds_init(void) {
+}
+
+void button_init(void) {
+}
 
 /**
  * Main entry point
  **/
 int main(void) {
+  /* initialize low level function */
+  board_init();
+
+  leds_init();
+  button_init();
+
+  timer_init();
+
+  /* enable interrupts */
 
   for (;;) {
   }
