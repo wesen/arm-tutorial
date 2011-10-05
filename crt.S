@@ -32,7 +32,7 @@
          * see datasheet: pp. 20
          */
         .set AT91C_BASE_AIC, 0xfffff000 /* AIC base address */
-        .set AT91_PIOA_CODR, 0xfffff434 /* PIO clear output data register */
+        .set AT91C_PIOA_CODR, 0xfffff434 /* PIO clear output data register */
         .set AT91C_AIC_IVR, 0xfffff100  /* AIC IRQ interrupt vector register */
         .set AT91C_AIC_FVR, 0xfffff104  /* AIC FIQ interrupt vector register */
         .set AIC_IVR, 256               /* irq vector register offset from base above */
