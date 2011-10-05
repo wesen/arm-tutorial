@@ -15,7 +15,7 @@ ASFLAGS	 += -ahls -mapcs-32
 LDFLAGS	 += -Map main.map -T$(LDSCRIPT)
 
 TARGET = blinker
-OBJS   = crt.o main.o board.o timer_isr.o timer_setup.o isr_support.o blinker.o
+OBJS   = crt.o main.o board.o timer.o blinker.o
 
 all: $(TARGET)
 
