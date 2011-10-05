@@ -1,14 +1,12 @@
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; C startup code for AT91SAM7S256
-;;;
-;;; datasheet: http://www.atmel.com/dyn/resources/prod_documents/doc6175.pdf
-;;;
-;;; reformatted version of James P Lynch - at91 tutorial
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * C startup code for AT91SAM7S256
+ *
+ * datasheet: http://www.atmel.com/dyn/resources/prod_documents/doc6175.pdf
+ *
+ * reformatted version of James P Lynch - at91 tutorial
+ *
+ */
 
         /* stack sizes */
         .set    UND_STACK_SIZE, 0x10
@@ -28,11 +26,11 @@
         .set I_BIT, 0x80
         .set F_BIT, 040
 
-        /**
+        /*
          * addresses of AIC and PIO
          *
          * see datasheet: pp. 20
-         **/
+         */
         .set AT91C_BASE_AIC, 0xfffff000 /* AIC base address */
         .set AT91_PIOA_CODR, 0xfffff434 /* PIO clear output data register */
         .set AT91C_AIC_IVR, 0xfffff100  /* AIC IRQ interrupt vector register */
@@ -64,12 +62,10 @@
         .align /* align on 32-bit boundary */
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; vector table
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * vector table
+ *
+ */
 
 _vec_reset:     b       _init_reset
 _vec_undef:     b       at91_undef_handler
@@ -82,13 +78,11 @@ _vec_fiq:
 
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; simple fiq handler that turns on LED3 (port PA2) when SW1 is pressed
-;;;
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * simple fiq handler that turns on LED3 (port PA2) when SW1 is pressed
+ *
+ *
+ */
 
 at91_fiq_handler:
         /* store return address in lr */
@@ -113,22 +107,20 @@ at91_fiq_handler:
         movs    pc, lr
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; init reset handler (called on boot)
-;;;
-;;; SVU mode, interrupts disabled
-;;;
-;;; - create a stack for each ARM mode
-;;; - set up a stack pointer for each ARM mode
-;;; - turns off interrupts in each mode
-;;; - leave CPU in SYS (system) mode
-;;; - block copies the initializers to .data section
-;;; - clears the .bss section to zero
-;;; - branches to main()
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * init reset handler (called on boot)
+ *
+ * SVU mode, interrupts disabled
+ *
+ * - create a stack for each ARM mode
+ * - set up a stack pointer for each ARM mode
+ * - turns off interrupts in each mode
+ * - leave CPU in SYS (system) mode
+ * - block copies the initializers to .data section
+ * - clears the .bss section to zero
+ * - branches to main()
+ *
+ */
 
         .text
         .align
@@ -189,15 +181,13 @@ _init_reset:
         b main
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; at91 irq handler
-;;;
-;;; IRQ handler taken from Atmel website (www.at91.com)
-;;; Keil example project: AT91SAM7S-Interrupt_SAM7S
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * at91 irq handler
+ *
+ * IRQ handler taken from Atmel website (www.at91.com)
+ * Keil example project: AT91SAM7S-Interrupt_SAM7S
+ *
+ */
 
 at91_irq_handler:
         /* adjust and save lr_irq in IRQ stack */
@@ -208,16 +198,16 @@ at91_irq_handler:
         mrs     r14, SPSR
         stmfd   sp!, {r0, r14}
 
-        /**
+        /*
          * read AIC_IVR to acknowledge interrupt
-         **/
+         */
         ldr     r14, =AT91C_BASE_AIC
         ldr     r0,  [r14, #AIC_IVR]
 
-        /**
+        /*
          * write in the IVR to support protect mode (no action on reading AIC to help debuggers).
          * this has no effect in normal mode, in protect mode, it deasserts the nIRQ and clears the source
-         **/
+         */
         str     r14, [r14, #AIC_IVR]
 
         /* enable interrupt and switch to superviso mode */
@@ -248,55 +238,46 @@ at91_irq_handler:
         ldmia   sp!, {pc}^
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; at91 data abort handler
-;;;
-;;; entered on data abort exception
-;;; enters blink routine (3 blinks)
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * at91 data abort handler
+ *
+ * entered on data abort exception
+ * enters blink routine (3 blinks)
+ *
+ */
 at91_dabt_handler:
         mov     r0, #3
         b       blinker
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; at91 prefetch abort handler
-;;;
-;;; entered on prefetch abort exception
-;;; enters blink routine (2 blinks)
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * at91 prefetch abort handler
+ *
+ * entered on prefetch abort exception
+ * enters blink routine (2 blinks)
+ *
+ */
 at91_pabt_handler:
         mov     r0, #2
         b       blinker
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; at91 undefined instruction handler
-;;;
-;;; entered on undefined instruction exception
-;;; enters blink routine (1 blink)
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
+ *
+ * at91 undefined instruction handler
+ *
+ * entered on undefined instruction exception
+ * enters blink routine (1 blink)
+ *
+ */
 at91_undef_handler:
         mov     r0, #1
         b       blinker
 
 /*
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Default IRQ handlers
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-*/
-
+ *
+ * Default IRQ handlers
+ *
+ */
 at91_default_fiq_handler:
         b       at91_default_fiq_handler
 
