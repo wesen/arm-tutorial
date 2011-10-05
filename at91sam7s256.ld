@@ -54,7 +54,7 @@ SECTIONS {
      _data = .;
 
      *(.data)
-     _edata = .
+     _edata = .;
   } >ram AT >flash /* put all in RAM, but LMA initializer copy into FLASH */
 
   .bss : {
