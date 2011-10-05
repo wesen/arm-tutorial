@@ -24,7 +24,7 @@
         .set ARM_MODE_UND, 0x1b
         .set ARM_MODE_SYS, 0x1f
         .set I_BIT, 0x80
-        .set F_BIT, 040
+        .set F_BIT, 0x40
 
         /*
          * addresses of AIC and PIO
@@ -56,6 +56,13 @@
         .global at91_dabt_handler
         .global at91_pabt_handler
         .global at91_undef_handler
+
+        .global irq_disable
+        .global irq_enable
+        .global irq_restore
+        .global fiq_disable
+        .global fiq_enable
+        .global fiq_restore
 
         .text
         .arm   /* compiler for ARM 32-bit instruction set */
@@ -218,7 +225,7 @@ at91_irq_handler:
 
         /* branch to the routine pointed by the AIC_IVR */
         mov     r14, pc
-        bx      r0              // branch and exchange instruction set
+        bx      r0              /* branch and exchange instruction set */
 
         /* restore registers and Lr from user stack */
         ldmia   sp!, { r1-r3, r12, r14 }
@@ -286,5 +293,53 @@ at91_default_irq_handler:
 
 at91_spurious_handler:
         b       at91_spurious_handler
+
+/***************************************************************************
+*
+* IRQ helpers (for C)
+*
+***************************************************************************/
+
+irq_disable:
+        mrs     r0, CPSR        /* read CPSR into r0 */
+        orr     r3, r0, #I_BIT  /* set the I bit to disable IRQs */
+        msr     CPSR_fc, r3     /* write back to CPSR (flags + control) */
+        bx      lr              /* return the old CPSR value */
+
+irq_enable:
+        mrs     r0, CPSR
+        bic     r3, r0, #I_BIT  /* clear the I bit to enable IRQs */
+        msr     CPSR_fc, r3
+        bx      lr              /* return the previous CPSR value */
+
+irq_restore:
+        mrs     r3, CPSR
+        bic     r2, r3, #I_BIT  /* clear the I_BIT in CPSR */
+        and     r0, r0, #I_BIT  /* get the I_BIT of the passed CPSR argument */
+        orr     r0, r2, r0      /* set the I_BIT in CPSR to the I_BIT of the passed CPSR */
+        msr     CPSR_fc, r0     /* store in CPSR */
+        mov     r0, r3          /* return the previous CPSR value */
+        bx      lr
+
+fiq_disable:
+        mrs     r0, CPSR        /* read CPSR into r0 */
+        orr     r3, r0, #F_BIT  /* set the F bit to disable FIQs */
+        msr     CPSR_fc, r3     /* write back to CPSR (flags + control) */
+        bx      lr              /* return the old CPSR value */
+
+fiq_enable:
+        mrs     r0, CPSR
+        bic     r3, r0, #F_BIT  /* clear the F bit to enable FIQs */
+        msr     CPSR_fc, r3
+        bx      lr              /* return the previous CPSR value */
+
+fiq_restore:
+        mrs     r3, CPSR
+        bic     r2, r3, #F_BIT  /* clear the F_BIT in CPSR */
+        and     r0, r0, #F_BIT  /* get the F_BIT of the passed CPSR argument */
+        orr     r0, r2, r0      /* set the F_BIT in CPSR to the F_BIT of the passed CPSR */
+        msr     CPSR_fc, r0     /* store in CPSR */
+        mov     r0, r3          /* return the previous CPSR value */
+        bx      lr
 
         .end
