@@ -3,6 +3,24 @@
 
 #include <inttypes.h>
 #include "at91sam7s256.h"
+#include "helpers.h"
+
+/**
+ * board settings
+ **/
+#define LED1 (1 << 0) /* PA0 */
+#define LED2 (1 << 1) /* PA1 */
+#define LED3 (1 << 2) /* PA2 */
+#define LED4 (1 << 3) /* PA3 */
+#define LED_MASK (LED1|LED2|LED3|LED4)
+
+#define SW1_MASK (1 << 19)
+#define SW_MASK (SW1_MASK)
+#define SW1      (1 << 19)
+
+#define EXT_OC 18432000 /* external oscillator */
+#define MCK    47923200 /* main clock frequency */
+#define MCKKHz ((MCK)/1000) /* main clock in khz */
 
 void board_init(void);
 
