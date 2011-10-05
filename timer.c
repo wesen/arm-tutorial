@@ -77,6 +77,19 @@ void timer_init(void) {
 
   /* enable all interrupts except RC */
   pTC->TC_IDR = ~(AT91C_TC_CPCS);
+
+  /*
+   * setup the AIC register for timer 0
+   *
+   * see datasheet pp. 161-176
+   */
+  volatile AT91PS_AIC pAIC = AT91C_BASE_AIC;
+  WRITE_BIT(pAIC->AIC_IDCR, AT91C_ID_TC0);                      /* disable timer 0 in AIC interrupt disable register */
+  pAIC->AIC_SVR[AT91C_ID_TC0] = (uint32_t)timer0_irq_handler; /* set the irq handler in source vector register */
+  pAIC->AIC_SMR[AT91C_ID_TC0] =                               /* set interrupt type and priority */
+    (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x4);
+  WRITE_BIT(pAIC->AIC_ICCR, AT91C_ID_TC0);                      /* clear the tc0 in interrupt clear register */
+  WRITE_BIT(pAIC->AIC_IECR, AT91C_ID_TC0);                      /* enable tc0 interrupt in AIC interrupt enable register */
 }
 
 uint32_t timer0_tick_count = 0;
