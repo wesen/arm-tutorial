@@ -1,10 +1,8 @@
-#include <inttypes.h>
-
 #include "board.h"
 
-void low_level_init(void) {
+void board_init(void) {
   /* pointer to power management controller */
-  AT91PS_PMC pPMC = AT91C_BASE_PMC;
+  volatile AT91PS_PMC pPMC = AT91C_BASE_PMC;
 
   /*
    * set flash wait state
@@ -53,9 +51,9 @@ void low_level_init(void) {
    * PLLCOUNT = number of slow clock cycles before the LOCK bit is set in PMC_SR after CKGR_PLLR is written
    * PLLCOUNT = 10
    */
-  pPMC->PMC_PLLR = ((AT91C_CKGR_DIV & 14) | /* set DIV */
+  pPMC->PMC_PLLR = ((AT91C_CKGR_DIV & 14) |             /* set DIV */
                     (AT91C_CKGR_PLLCOUNT & (10 << 8)) | /* set PLLCOUNT */
-                    (AT91C_CKGR_MUL & (72 << 16)) /* set MUL */
+                    (AT91C_CKGR_MUL & (72 << 16))       /* set MUL */
                     );
 
   /* wait the start up time (until PMC status register LOCK bit is set) */

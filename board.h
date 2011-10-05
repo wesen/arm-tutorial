@@ -1,9 +1,10 @@
 #ifndef BOARD_H__
 #define BOARD_H__
 
+#include <inttypes.h>
 #include "at91sam7s256.h"
 
-void low_level_init(void);
+void board_init(void);
 
 /*
  * external interrupt handler definitions written in ARM
