@@ -9,13 +9,13 @@ OBJDUMP = $(TOOLCHAIN_PREFIX)objdump
 
 LDSCRIPT = at91sam7s256.ld
 
-CFLAGS	 += -I. -fno-common -g
+CFLAGS	 += -I. -fno-common -g -std=gnu99
 CXXFLAGS += -I. -fno-common -g
 ASFLAGS	 += -ahls -mapcs-32
 LDFLAGS	 += -Map main.map -T$(LDSCRIPT)
 
 TARGET = blinker
-OBJS   = crt.o main.o timer_isr.o timer_setup.o isr_support.o lowlevel_init.o blinker.o
+OBJS   = crt.o main.o board.o timer_isr.o timer_setup.o isr_support.o blinker.o
 
 all: $(TARGET)
 
