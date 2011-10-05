@@ -44,4 +44,10 @@ extern uint32_t fiq_enable(void);
 extern uint32_t fiq_disable(void);
 extern uint32_t fiq_restore(uint32_t cpsr);
 
+/*
+ * blinker debug routine
+ */
+extern uint32_t blink_count;
+void blinker(uint8_t code);
+
 #endif /* BOARD_H__ */
