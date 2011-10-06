@@ -18,9 +18,13 @@ ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
 
 BLINKER_OBJS   = blinker/crt.o blinker/main.o blinker/board.o blinker/timer.o blinker/blinker.o
 BLINKER_CPP_OBJS   = common/crt.o blinker-cpp/main.o common/board.o
+BLINKER_CPP_CLASS_OBJS   = common/crt.o blinker-cpp-class/main.o common/board.o
 BLINKER_C_OBJS   = common/crt.o blinker-c/main.o common/board.o
 
-all: blinker-flash.bin blinker-sram.bin blinker-c-sram.bin blinker-c-flash.bin blinker-cpp.bin
+all: blinker-flash.bin blinker-sram.bin \
+     blinker-c-sram.bin blinker-c-flash.bin \
+     blinker-cpp-sram.bin blinker-cpp-flash.bin \
+     blinker-cpp-class-sram.bin blinker-cpp-class-flash.bin \
 
 # targets
 
@@ -30,8 +34,18 @@ blinker-flash.elf: $(BLINKER_OBJS)
 blinker-sram.elf: $(BLINKER_OBJS)
 	$(LD) -Map $@.map  -Tat91sam7s256-sram.ld -o $@ $^
 
-blinker-cpp.elf: $(BLINKER_CPP_OBJS)
+blinker-cpp-sram.elf: $(BLINKER_CPP_OBJS)
 	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+
+blinker-cpp-flash.elf: $(BLINKER_CPP_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+
+
+blinker-cpp-class-sram.elf: $(BLINKER_CPP_CLASS_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+
+blinker-cpp-class-flash.elf: $(BLINKER_CPP_CLASS_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
 
 blinker-c-sram.elf: $(BLINKER_C_OBJS)
 	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
