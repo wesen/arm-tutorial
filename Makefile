@@ -74,5 +74,8 @@ OPENOCD_ADAPTER = openocd/jtagrs232.cfg
 debug:
 	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c "arm7_9 dcc_downloads enable" -c "arm7_9 fast_memory_access enable" -c init -c halt
 
+reset:
+	$(OPENOCD) -d1 -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt -c "reset init" -c "resume" -c "shutdown"
+
 clean:
 	- rm -f *.o blinker/*.o blinker-cpp/*.o *.lst *.hex *.map *.bin *.elf
