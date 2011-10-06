@@ -11,9 +11,9 @@ OPENOCD ?= openocd
 
 MCU = arm7tdmi
 
-C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU) -Os
+C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU) -Os -ffunction-sections -mthumb-interwork
 CFLAGS	 += $(C_CXX_FLAGS) -std=gnu99
-CXXFLAGS += $(C_CXX_FLAGS)
+CXXFLAGS += $(C_CXX_FLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
 
 BLINKER_OBJS   = blinker/crt.o blinker/main.o blinker/board.o blinker/timer.o blinker/blinker.o
