@@ -12,16 +12,18 @@ CFLAGS	 += -I. -fno-common -g -std=gnu99
 CXXFLAGS += -I. -fno-common -g
 ASFLAGS	 += -ahls -mapcs-32
 
-TARGET = blinker
-OBJS   = crt.o main.o board.o timer.o blinker.o
+COMMON_OBJS = board.o
+BLINKER_OBJS   = $(COMMON_OBJS) blinker/crt.o blinker/main.o blinker/timer.o blinker/blinker.o
 
-all: $(TARGET)-flash.bin $(TARGET)-sram.bin
+all: blinker-flash.bin blinker-sram.bin
 
-$(TARGET)-flash.elf: $(OBJS)
-	$(LD) -Map $(TARGET).map -Tat91sam7s256-flash.ld -o $@ $^
+blinker-flash.elf: $(BLINKER_OBJS)
+	$(LD) -Map $@.map -Tat91sam7s256-flash.ld -o $@ $^
 
-$(TARGET)-sram.elf: $(OBJS)
-	$(LD) -Map $(TARGET).map -Tat91sam7s256-sram.ld -o $@ $^
+blinker-sram.elf: $(BLINKER_OBJS)
+	$(LD) -Map $@.map  -Tat91sam7s256-sram.ld -o $@ $^
+
+# common rules
 
 %.bin: %.elf
 	$(OBJCOPY) --output-target=binary $< $@
@@ -52,16 +54,6 @@ $(TARGET)-sram.elf: $(OBJS)
 
 OPENOCD_ADAPTER = openocd/jtagrs232.cfg
 
-OPENOCD_ARGS = -d0
-OPENOCD_ARGS += -c "arm7_9 dcc_downloads enable"
-OPENOCD_ARGS += -c "arm7_9 fast_memory_access enable"
-FLASH_ARGS = -c init -c targets
-FLASH_ARGS += -c halt
-FLASH_ARGS += -c "flash write_image erase $(TARGET).bin 0x100000 bin" -c "verify_image $(TARGET).bin 0x100000"
-FLASH_ARGS += -c "reset run"
-FLASH_ARGS += -c "resume"
-FLASH_ARGS += -c shutdown
-
 %.upload: %.bin
 	./openocd-flash.sh $< -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg
 
@@ -69,4 +61,4 @@ debug:
 	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt
 
 clean:
-	- rm -f $(OBJS) *.lst *.hex *.map *.bin *.elf
+	- rm -f *.o blinker/*.o *.lst *.hex *.map *.bin *.elf
