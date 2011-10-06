@@ -53,9 +53,11 @@ int main(void) {
   board_init();
 
   leds_init();
+  /*
   button_init();
 
   timer_init();
+  */
 
   /* enable interrupts */
   irq_enable();
@@ -64,7 +66,7 @@ int main(void) {
   volatile AT91PS_PIO pPIO = AT91C_BASE_PIOA;
 
   for (;;) {
-    if (IS_BIT_SET(pPIO->PIO_ODSR, LED1)) {
+    if ((pPIO->PIO_ODSR & LED1) == LED1) {
       pPIO->PIO_CODR = LED1;
     } else {
       pPIO->PIO_SODR = LED1;
