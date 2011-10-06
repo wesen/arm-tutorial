@@ -8,7 +8,7 @@
 /**
  * board settings
  **/
-#define LED1 (1 << 0) /* PA0 */
+#define LED1 (1UL << 8) /* PA8 */
 #define LED2 (1 << 1) /* PA1 */
 #define LED3 (1 << 2) /* PA2 */
 #define LED4 (1 << 3) /* PA3 */
