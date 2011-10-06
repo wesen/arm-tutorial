@@ -18,9 +18,9 @@ ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
 
 BLINKER_OBJS   = blinker/crt.o blinker/main.o blinker/board.o blinker/timer.o blinker/blinker.o
 BLINKER_CPP_OBJS   = common/crt.o blinker-cpp/main.o common/board.o
-BLINKER_C_OBJS   = blinker-c/crt.o blinker-c/main.o common/board.o
+BLINKER_C_OBJS   = common/crt.o blinker-c/main.o common/board.o
 
-all: blinker-flash.bin blinker-sram.bin blinker-c.bin blinker-cpp.bin
+all: blinker-flash.bin blinker-sram.bin blinker-c-sram.bin blinker-c-flash.bin blinker-cpp.bin
 
 # targets
 
@@ -33,8 +33,11 @@ blinker-sram.elf: $(BLINKER_OBJS)
 blinker-cpp.elf: $(BLINKER_CPP_OBJS)
 	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
 
-blinker-c.elf: $(BLINKER_C_OBJS)
+blinker-c-sram.elf: $(BLINKER_C_OBJS)
 	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
+
+blinker-c-flash.elf: $(BLINKER_C_OBJS)
+	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
 
 
 # common rules
@@ -72,7 +75,7 @@ OPENOCD_ADAPTER = openocd/jtagrs232.cfg
 	./openocd-flash.sh $< -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg
 
 debug:
-	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c "arm7_9 dcc_downloads enable" -c "arm7_9 fast_memory_access enable" -c init -c halt
+	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt -c "reset halt" -c "arm7_9 fast_memory_access enable"
 
 reset:
 	$(OPENOCD) -d1 -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt -c "reset init" -c "resume" -c "shutdown"
