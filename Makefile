@@ -12,8 +12,7 @@ CFLAGS	 += -I. -fno-common -g -std=gnu99
 CXXFLAGS += -I. -fno-common -g
 ASFLAGS	 += -ahls -mapcs-32
 
-COMMON_OBJS = board.o
-BLINKER_OBJS   = $(COMMON_OBJS) blinker/crt.o blinker/main.o blinker/timer.o blinker/blinker.o
+BLINKER_OBJS   = blinker/board.o blinker/crt.o blinker/main.o blinker/timer.o blinker/blinker.o
 
 all: blinker-flash.bin blinker-sram.bin
 
