@@ -1,6 +1,7 @@
 TOOLCHAIN_PREFIX ?= arm-none-eabi-
 
 CC = $(TOOLCHAIN_PREFIX)gcc
+CXX = $(TOOLCHAIN_PREFIX)g++
 LD = $(TOOLCHAIN_PREFIX)ld
 AR = $(TOOLCHAIN_PREFIX)ar
 AS = $(TOOLCHAIN_PREFIX)as
@@ -8,19 +9,28 @@ OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
 OBJDUMP = $(TOOLCHAIN_PREFIX)objdump
 OPENOCD ?= openocd
 
-CFLAGS	 += -I. -fno-common -g -std=gnu99
-CXXFLAGS += -I. -fno-common -g
-ASFLAGS	 += -ahls -mapcs-32
+MCU = arm7tdmi
+
+C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU)
+CFLAGS	 += $(C_CXX_FLAGS) -std=gnu99
+CXXFLAGS += $(C_CXX_FLAGS)
+ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
 
 BLINKER_OBJS   = blinker/board.o blinker/crt.o blinker/main.o blinker/timer.o blinker/blinker.o
+BLINKER_CPP_OBJS   = common/board.o common/crt.o blinker-cpp/main.o
 
 all: blinker-flash.bin blinker-sram.bin
+
+# targets
 
 blinker-flash.elf: $(BLINKER_OBJS)
 	$(LD) -Map $@.map -Tat91sam7s256-flash.ld -o $@ $^
 
 blinker-sram.elf: $(BLINKER_OBJS)
 	$(LD) -Map $@.map  -Tat91sam7s256-sram.ld -o $@ $^
+
+blinker-cpp.elf: $(BLINKER_CPP_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
 
 # common rules
 
@@ -60,4 +70,4 @@ debug:
 	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt
 
 clean:
-	- rm -f *.o blinker/*.o *.lst *.hex *.map *.bin *.elf
+	- rm -f *.o blinker/*.o blinker-cpp/*.o *.lst *.hex *.map *.bin *.elf
