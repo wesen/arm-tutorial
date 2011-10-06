@@ -6,7 +6,18 @@
  * Adapted from James P Lynch ARM tutorial
  **/
 
+#include <stdlib.h>
 #include "board.h"
+
+/* no dynamic allocation */
+void *operator new(size_t size) throw() { return NULL; }
+void operator delete(void *p) throw() { }
+
+extern "C" int __aeabi_atexit(void *object,
+                              void (*destructor)(void *),
+                              void *dso_handle) {
+  return 0;
+}
 
 /*
  * initialize the PIO LED pins, and turn them off

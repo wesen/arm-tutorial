@@ -35,17 +35,17 @@ blinker-sram.elf: $(BLINKER_OBJS)
 	$(LD) -Map $@.map  -Tat91sam7s256-sram.ld -o $@ $^
 
 blinker-cpp-sram.elf: $(BLINKER_CPP_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
 
 blinker-cpp-flash.elf: $(BLINKER_CPP_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
 
 
 blinker-cpp-class-sram.elf: $(BLINKER_CPP_CLASS_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
 
 blinker-cpp-class-flash.elf: $(BLINKER_CPP_CLASS_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
 
 blinker-c-sram.elf: $(BLINKER_C_OBJS)
 	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
