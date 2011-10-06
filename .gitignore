@@ -3,3 +3,5 @@
 *.hex
 *.map
 blinker
+*.bin
+*.elf
