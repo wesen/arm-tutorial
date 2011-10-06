@@ -11,16 +11,16 @@ OPENOCD ?= openocd
 
 MCU = arm7tdmi
 
-C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU)
+C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU) -Os
 CFLAGS	 += $(C_CXX_FLAGS) -std=gnu99
 CXXFLAGS += $(C_CXX_FLAGS)
 ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
 
-BLINKER_OBJS   = blinker/board.o blinker/crt.o blinker/main.o blinker/timer.o blinker/blinker.o
-BLINKER_CPP_OBJS   = common/board.o common/crt.o blinker-cpp/main.o
-BLINKER_C_OBJS   = common/board.o common/crt.o blinker-c/main.o
+BLINKER_OBJS   = blinker/crt.o blinker/main.o blinker/board.o blinker/timer.o blinker/blinker.o
+BLINKER_CPP_OBJS   = common/crt.o blinker-cpp/main.o common/board.o
+BLINKER_C_OBJS   = blinker-c/crt.o blinker-c/main.o common/board.o
 
-all: blinker-flash.bin blinker-sram.bin
+all: blinker-flash.bin blinker-sram.bin blinker-c.bin blinker-cpp.bin
 
 # targets
 
@@ -33,7 +33,7 @@ blinker-sram.elf: $(BLINKER_OBJS)
 blinker-cpp.elf: $(BLINKER_CPP_OBJS)
 	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^ -lgcc -lc -lstdc++ -lnosys
 
-blinker-cpp.elf: $(BLINKER_CPP_OBJS)
+blinker-c.elf: $(BLINKER_C_OBJS)
 	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
 
 
