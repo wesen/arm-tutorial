@@ -5,3 +5,5 @@
 blinker
 *.bin
 *.elf
+thirdparty
+thirdparty/*

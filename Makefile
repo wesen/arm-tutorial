@@ -1,11 +1,16 @@
 TOOLCHAIN_PREFIX ?= arm-none-eabi-
+#TOOLCHAIN_PREFIX = /usr/local/llvm-arm/bin/llvm-
 
+#CC = $(TOOLCHAIN_PREFIX)gcc
 CC = $(TOOLCHAIN_PREFIX)gcc
 CXX = $(TOOLCHAIN_PREFIX)g++
 LD = $(TOOLCHAIN_PREFIX)ld
+#LD = arm-none-eabi-ld
 AR = $(TOOLCHAIN_PREFIX)ar
 AS = $(TOOLCHAIN_PREFIX)as
-OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
+GDB = $(TOOLCHAIN_PREFIX)gdb
+#OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
+OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = $(TOOLCHAIN_PREFIX)objdump
 OPENOCD ?= openocd
 
@@ -21,12 +26,20 @@ BLINKER_CPP_OBJS   = common/crt.o blinker-cpp/main.o common/board.o
 BLINKER_CPP_CLASS_OBJS   = common/crt.o blinker-cpp-class/main.o common/board.o
 BLINKER_C_OBJS   = common/crt.o blinker-c/main.o common/board.o
 
+MIDI_CV_OBJS = common/crt.o common/board.o common/cpp.o midicv/main.o
+
 all: blinker-flash.bin blinker-sram.bin \
      blinker-c-sram.bin blinker-c-flash.bin \
      blinker-cpp-sram.bin blinker-cpp-flash.bin \
      blinker-cpp-class-sram.bin blinker-cpp-class-flash.bin \
 
 # targets
+
+midicv.elf: $(MIDI_CV_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
+
+midicv-sram.elf: $(MIDI_CV_OBJS)
+	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
 
 blinker-flash.elf: $(BLINKER_OBJS)
 	$(LD) -Map $@.map -Tat91sam7s256-flash.ld -o $@ $^
@@ -87,6 +100,10 @@ OPENOCD_ADAPTER = openocd/jtagrs232.cfg
 
 %.upload: %.bin
 	./openocd-flash.sh $< -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg
+
+%.debug: %.elf
+	$(GDB) -x openocd/at91sam7s256.gdb $<
+
 
 debug:
 	$(OPENOCD) -f $(OPENOCD_ADAPTER) -f openocd/at91sam7s256.cfg $(OPENOCD_ARGS) -c init -c halt -c "reset halt" -c "arm7_9 fast_memory_access enable"
