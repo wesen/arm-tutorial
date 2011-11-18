@@ -16,15 +16,19 @@ OPENOCD ?= openocd
 
 MCU = arm7tdmi
 
-C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU) -Os -ffunction-sections -mthumb-interwork
+C_CXX_FLAGS = -I. -fno-common -g -Icommon -mcpu=$(MCU) -Os -ffunction-sections -mthumb-interwork -I/usr/local/include
 CFLAGS	 += $(C_CXX_FLAGS) -std=gnu99
-CXXFLAGS += $(C_CXX_FLAGS) -fno-rtti -fno-exceptions
+CXXFLAGS += $(C_CXX_FLAGS) -fno-rtti -fno-exceptions -fcheck-new
 ASFLAGS	 += -ahls -mapcs-32 -mcpu=$(MCU)
+CLD_FLASH_FLAGS = -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld
+CLD_SRAM_FLAGS = 
 
+COMMON_OBJS = common/crt.o common/board.o
 BLINKER_OBJS   = blinker/crt.o blinker/main.o blinker/board.o blinker/timer.o blinker/blinker.o
 BLINKER_CPP_OBJS   = common/crt.o blinker-cpp/main.o common/board.o
 BLINKER_CPP_CLASS_OBJS   = common/crt.o blinker-cpp-class/main.o common/board.o
 BLINKER_C_OBJS   = common/crt.o blinker-c/main.o common/board.o
+BOOST_BLINKER_OBJS = boost-blinker/main.o $(COMMON_OBJS)
 
 MIDI_CV_OBJS = common/crt.o common/board.o common/cpp.o midicv/main.o
 
@@ -32,39 +36,44 @@ all: blinker-flash.bin blinker-sram.bin \
      blinker-c-sram.bin blinker-c-flash.bin \
      blinker-cpp-sram.bin blinker-cpp-flash.bin \
      blinker-cpp-class-sram.bin blinker-cpp-class-flash.bin \
+     boost-blinker.bin
 
 # targets
 
+boost-blinker.elf: $(BOOST_BLINKER_OBJS)
+	$(CXX) $(CLD_FLASH_FLAGS) -o $@ $^
+
+
 midicv.elf: $(MIDI_CV_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
+	$(CXX) $(CLD_FLASH_FLAGS) -o $@ $^
 
 midicv-sram.elf: $(MIDI_CV_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
+	$(CXX) $(CLD_SRAM_FLAGS) -o $@ $^
 
 blinker-flash.elf: $(BLINKER_OBJS)
-	$(LD) -Map $@.map -Tat91sam7s256-flash.ld -o $@ $^
+	$(LD) $(CLD_FLASH_FLAGS) -o $@ $^
 
 blinker-sram.elf: $(BLINKER_OBJS)
-	$(LD) -Map $@.map  -Tat91sam7s256-sram.ld -o $@ $^
+	$(LD) $(CLD_SRAM_FLAGS) -o $@ $^
 
 blinker-cpp-sram.elf: $(BLINKER_CPP_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
+	$(CXX) $(CLD_SRAM_FLAGS) -o $@ $^
 
 blinker-cpp-flash.elf: $(BLINKER_CPP_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
+	$(CXX) $(CLD_FLASH_FLAGS) -o $@ $^
 
 
 blinker-cpp-class-sram.elf: $(BLINKER_CPP_CLASS_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
+	$(CXX) $(CLD_SRAM_FLAGS) -o $@ $^
 
 blinker-cpp-class-flash.elf: $(BLINKER_CPP_CLASS_OBJS)
-	$(CXX) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
+	$(CXX) $(CLD_FLASH_FLAGS) -o $@ $^
 
 blinker-c-sram.elf: $(BLINKER_C_OBJS)
-	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-sram.ld -o $@ $^
+	$(CC) $(CLD_SRAM_FLAGS) -o $@ $^
 
 blinker-c-flash.elf: $(BLINKER_C_OBJS)
-	$(CC) -nostartfiles -nostdlib -Wl,-Map=$@.map,--cref  -Tat91sam7s256-flash.ld -o $@ $^
+	$(CC) $(CLD_FLASH_FLAGS) -o $@ $^
 
 
 # common rules
